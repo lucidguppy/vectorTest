@@ -22,7 +22,7 @@ auto TimeToCopyArray () {
         memcpy(dstArr,srcArr, sizeof(int)*bigNum);
     }
     auto ts2 = std::chrono::high_resolution_clock::now();
-    assert(dstArr[3] == 3);
+    assert(dstArr[bigNum-1] == bigNum-1);
     auto dur = std::chrono::duration_cast<std::chrono::microseconds>(ts2-ts1).count();
     delete[] dstArr;
     delete[] srcArr;
@@ -35,16 +35,16 @@ auto TimeToCopyVector () {
     assert(dest[10] == 0);
     int ii {0};
     for (auto it = src.begin(); it != src.end(); ++it ) {
-        *it = ++ii;
+        *it = ii++;
     }
-    assert(src[9] == 10);
+    assert(src[9] == 9);
     // assignment
     auto ts1 = std::chrono::high_resolution_clock::now();
     for (int ii = 0; ii < loopNum; ++ii) {
         dest = src;
     }
     auto ts2 = std::chrono::high_resolution_clock::now();
-    assert(dest[8] == 9);
+    assert(dest[bigNum-1] == bigNum-1);
     auto dur = std::chrono::duration_cast<std::chrono::microseconds>(ts2-ts1).count();
     return dur;
 }
