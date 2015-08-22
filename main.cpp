@@ -6,6 +6,7 @@
 
 
 auto constexpr bigNum = 100000;
+auto constexpr loopNum = 100;
 
 auto TimeToCopyArray () {
     // array
@@ -17,7 +18,9 @@ auto TimeToCopyArray () {
     }
     assert(dstArr[3] == 0);
     auto ts1 = std::chrono::high_resolution_clock::now();
-    memcpy(dstArr,srcArr, sizeof(int)*bigNum);
+    for (int ii = 0; ii < loopNum; ++ii) {
+        memcpy(dstArr,srcArr, sizeof(int)*bigNum);
+    }
     auto ts2 = std::chrono::high_resolution_clock::now();
     assert(dstArr[3] == 3);
     auto dur = std::chrono::duration_cast<std::chrono::microseconds>(ts2-ts1).count();
@@ -37,7 +40,9 @@ auto TimeToCopyVector () {
     assert(src[9] == 10);
     // assignment
     auto ts1 = std::chrono::high_resolution_clock::now();
-    dest = src;
+    for (int ii = 0; ii < loopNum; ++ii) {
+        dest = src;
+    }
     auto ts2 = std::chrono::high_resolution_clock::now();
     assert(dest[8] == 9);
     auto dur = std::chrono::duration_cast<std::chrono::microseconds>(ts2-ts1).count();
