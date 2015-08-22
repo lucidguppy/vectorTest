@@ -6,7 +6,6 @@
 
 
 auto constexpr bigNum = 100000;
-auto constexpr theQuestion = 7;
 
 auto TimeToCopyArray () {
     // array
