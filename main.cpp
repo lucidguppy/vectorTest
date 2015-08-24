@@ -7,9 +7,14 @@
 #include <ctime>
 #include <cstdlib>
 
+// Define VERIFY to perform some asserts.
+// Is disabled by default to simplify the
+// output assembly code for easier analysis.
+#undef VERIFY
+
 
 auto constexpr bigNum = 100000;
-auto constexpr loopNum = 100;
+auto constexpr loopNum = 60000;
 
 std::pair<int,int> TimeToCopyArray () {
     // array
@@ -19,14 +24,17 @@ std::pair<int,int> TimeToCopyArray () {
         srcArr[ii] = ii;
         dstArr[ii] = 0;
     }
+#ifdef VERIFY
     assert(dstArr[3] == 0);
+#endif
     auto ts1 = std::chrono::high_resolution_clock::now();
     for (int ii = 0; ii < loopNum; ++ii) {
-        *srcArr = rand();
         memcpy(dstArr,srcArr, sizeof(int)*bigNum);
     }
     auto ts2 = std::chrono::high_resolution_clock::now();
+#ifdef VERIFY
     assert(dstArr[bigNum-1] == bigNum-1);
+#endif
     auto dur = std::chrono::duration_cast<std::chrono::microseconds>(ts2-ts1).count();
     int d = *srcArr;
     delete[] dstArr;
@@ -37,20 +45,25 @@ std::pair<int,int> TimeToCopyArray () {
 std::pair<int, int> TimeToCopyVector () {
     std::vector<int> src(bigNum);
     std::vector<int> dest(bigNum, 0);
+#ifdef VERIFY
     assert(dest[10] == 0);
+#endif
     int ii {0};
     for (auto it = src.begin(); it != src.end(); ++it ) {
         *it = ii++;
     }
+#ifdef VERIFY
     assert(src[9] == 9);
+#endif
     // assignment
     auto ts1 = std::chrono::high_resolution_clock::now();
     for (int ii = 0; ii < loopNum; ++ii) {
-        src[0] = rand();
         dest = src;
     }
     auto ts2 = std::chrono::high_resolution_clock::now();
+#ifdef VERIFY
     assert(dest[bigNum-1] == bigNum-1);
+#endif
     auto dur = std::chrono::duration_cast<std::chrono::microseconds>(ts2-ts1).count();
     return std::make_pair((int)dur,src[0]);
 }
@@ -58,7 +71,7 @@ std::pair<int, int> TimeToCopyVector () {
 int main() {
     srand(time(NULL));
     std::cout << "ArrayCopy(dur us), VectorCopy(dur us)\n";
-    constexpr auto loops = 1000;
+    constexpr auto loops = 10;
     for (int ii = 0; ii < loops; ++ii) {
         std::cout << TimeToCopyArray().first << "," << TimeToCopyVector().first << "\n";
     }
