@@ -3,10 +3,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
+import sys
 matplotlib.style.use('ggplot')
-df = pd.read_csv('data.csv')
-
-plt.figure()
+df = pd.read_csv(sys.argv[1])
 
 #df.hist(bins=30)
 df.plot(widths=0.8, notch=False, kind='box', sym='r+')
