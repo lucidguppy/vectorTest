@@ -1,0 +1,11 @@
+./vectorTest 64 6000000 > data64.csv
+./vectorTest 128 6000000 > data128.csv
+./vectorTest 256 3000000 > data256.csv
+./vectorTest 1024 1500000 > data1025.csv
+./vectorTest 2048 600000 > data2048.csv
+./vectorTest 4096 300000 > data4096.csv
+./vectorTest 8192 100000 > data8192.csv
+./vectorTest 16384 80000 > data16384.csv
+./vectorTest 32768 40000 > data32768.csv
+./vectorTest 65535 20000 > data65535.csv
+./vectorTest 1048576 10000 > data1048576.csv
