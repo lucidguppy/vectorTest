@@ -12,7 +12,7 @@
 // output assembly code for easier analysis.
 #undef VERIFY
 
-auto constexpr loops = 10;
+auto constexpr loops = 100;
 
 int theBigNum;
 int loopNum;
