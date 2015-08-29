@@ -6,61 +6,62 @@
 #include <utility>
 #include <ctime>
 #include <cstdlib>
+#include <iomanip>
 
+// Define VERIFY to perform some asserts.
+// Is disabled by default to simplify the
+// output assembly code for easier analysis.
+#undef VERIFY
 
-auto constexpr bigNum = 100000;
-auto constexpr loopNum = 100;
+auto constexpr loops = 100;
 
-std::pair<int,int> TimeToCopyArray () {
-    // array
-    int* dstArr = new int [bigNum];
-    int* srcArr = new int [bigNum];
-    for (auto ii = 0; ii < bigNum; ++ii ) {
-        srcArr[ii] = ii;
-        dstArr[ii] = 0;
-    }
-    assert(dstArr[3] == 0);
-    auto ts1 = std::chrono::high_resolution_clock::now();
-    for (int ii = 0; ii < loopNum; ++ii) {
-        *srcArr = rand();
-        memcpy(dstArr,srcArr, sizeof(int)*bigNum);
-    }
-    auto ts2 = std::chrono::high_resolution_clock::now();
-    assert(dstArr[bigNum-1] == bigNum-1);
-    auto dur = std::chrono::duration_cast<std::chrono::microseconds>(ts2-ts1).count();
-    int d = *srcArr;
-    delete[] dstArr;
-    delete[] srcArr;
-    return std::make_pair((int)dur,d);
-}
+int theBigNum;
+int loopNum;
 
-std::pair<int, int> TimeToCopyVector () {
-    std::vector<int> src(bigNum);
-    std::vector<int> dest(bigNum, 0);
-    assert(dest[10] == 0);
-    int ii {0};
-    for (auto it = src.begin(); it != src.end(); ++it ) {
-        *it = ii++;
-    }
-    assert(src[9] == 9);
-    // assignment
-    auto ts1 = std::chrono::high_resolution_clock::now();
-    for (int ii = 0; ii < loopNum; ++ii) {
-        src[0] = rand();
-        dest = src;
-    }
-    auto ts2 = std::chrono::high_resolution_clock::now();
-    assert(dest[bigNum-1] == bigNum-1);
-    auto dur = std::chrono::duration_cast<std::chrono::microseconds>(ts2-ts1).count();
-    return std::make_pair((int)dur,src[0]);
-}
+#include "TimeToCopyArray.h"
+#include "TimeToCopyVector.h"
 
-int main() {
-    srand(time(NULL));
-    std::cout << "ArrayCopy(dur us), VectorCopy(dur us)\n";
-    constexpr auto loops = 1000;
+int main(int argc, char* argv[]) {
+    theBigNum = atoi(argv[1]);
+    loopNum = atoi(argv[2]);
+
+    std::vector<std::pair<int,int>> array;
+    std::vector<std::pair<int,int>> vector;
+
     for (int ii = 0; ii < loops; ++ii) {
-        std::cout << TimeToCopyArray().first << "," << TimeToCopyVector().first << "\n";
+        array.push_back(TimeToCopyArray(theBigNum, loopNum));
+        vector.push_back(TimeToCopyVector(theBigNum, loopNum));
     }
+
+    // sum the times
+    auto arrayTotal = 0;
+    for(auto e : array)
+    {
+        arrayTotal += e.first;
+    }
+
+    auto vectorTotal = 0;
+    for(auto e : vector)
+    {
+        vectorTotal += e.first;
+    }
+
+    // calculate the averages
+    auto arrayAverage = arrayTotal / (double)array.size();
+    auto vectorAverage = vectorTotal / (double)vector.size();
+
+    // calculate the time relative to the vector
+    auto vectorTimePercentage = (vectorAverage - arrayAverage) / vectorAverage;
+    auto vectorDeltaString = (vectorTimePercentage > 0) ? "slower" : "faster";
+
+    std::ios_base::fmtflags originalFlags = std::cout.flags();
+    std::cout << "ArrayCopy(dur us) - " << theBigNum << " bytes, VectorCopy(dur us) - "
+        << theBigNum << " bytes. Vector " << vectorDeltaString << " by "
+        << std::fixed << std::setprecision(1) << (vectorTimePercentage * 100.0) << "%\n";
+    std::cout.flags( originalFlags );
+    for (int ii = 0; ii < loops; ++ii) {
+        std::cout << array[ii].first << "," << vector[ii].first << "\n";
+    }
+
     return 0;
 }
